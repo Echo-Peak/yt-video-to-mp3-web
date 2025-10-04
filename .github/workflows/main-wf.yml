@@ -29,6 +29,8 @@ jobs:
         run: yarn build
         env:
           REACT_APP_YT_API_KEY: ${{ secrets.REACT_APP_YT_API_KEY }}
+          REACT_APP_COGNITO_CLIENT_ID:
+            ${{ secrets.REACT_APP_COGNITO_CLIENT_ID }}
           REACT_APP_COGNITO_AUTHORITY:
             ${{ secrets.REACT_APP_COGNITO_AUTHORITY }}
           REACT_APP_COGNITO_REDIRECT_URI:
