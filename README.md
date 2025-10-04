@@ -11,8 +11,7 @@
 ## ✨ About
 
 **yt-video-to-mp3** focuses on speed, privacy, and zero-friction UX. Paste a
-YouTube URL, hit **Convert**, and download a clean MP3—no sign-ups, no trackers,
-no ads.
+YouTube URL, hit **Convert**, and download a clean MP3.
 
 ---
 
@@ -34,3 +33,7 @@ no ads.
     matching against public metadata sources
 - Embed TOC from video metadata if available
 - Artwork embedding
+
+### Privacy
+
+[See privacy policy](https://github.com/Echo-Peak/yt-video-to-mp3-web/blob/main/public/PrivacyPolicy.md)
