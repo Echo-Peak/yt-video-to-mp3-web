@@ -28,7 +28,8 @@ export const VideoProcessHistoryProvider = ({
 
   useEffect(() => {
     setHistory(getAll());
-  }, [getAll]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const clearHistory = () => {
     setHistory([]);
