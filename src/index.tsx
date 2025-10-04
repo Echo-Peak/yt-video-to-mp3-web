@@ -34,8 +34,6 @@ const cognitoAuthConfig = {
   },
 };
 
-console.log("cognitoAuthConfig", cognitoAuthConfig);
-
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );

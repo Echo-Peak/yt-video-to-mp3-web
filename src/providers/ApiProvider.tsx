@@ -81,7 +81,6 @@ export const ApiProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       const videoData = await fetchVideoData(extractVideoId(videoUrl));
-      console.log(videoData);
       if (!videoData) {
         throw new Error("Invalid YouTube video URL");
       }
