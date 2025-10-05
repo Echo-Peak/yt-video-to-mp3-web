@@ -1,5 +1,6 @@
 import { getClientUuid } from "../helpers/getClientUuid";
 import { ConversionState } from "../types/ConversionState";
+import { StatusResponse } from "../types/StatusResponseDto";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -40,7 +41,7 @@ export const useBackendApi = () => {
     });
   };
 
-  const getStatus = async (videoId: string): Promise<ConversionState> => {
+  const getStatus = async (videoId: string): Promise<StatusResponse> => {
     const clientId = getClientUuid();
     try {
       const result = await sendConversionRequest({
@@ -49,18 +50,21 @@ export const useBackendApi = () => {
         clientId,
       });
       if (result.status === "in-progress") {
-        return ConversionState.InProgress;
+        return { status: ConversionState.InProgress };
       }
       if (result.status === "completed") {
-        return ConversionState.Completed;
+        return {
+          status: ConversionState.Completed,
+          downloadUrl: result.downloadUrl as string,
+        };
       }
       if (result.status === "error") {
-        return ConversionState.Error;
+        return { status: ConversionState.Error };
       }
     } catch {
-      return ConversionState.Error;
+      return { status: ConversionState.Error };
     }
-    return ConversionState.Idle;
+    return { status: ConversionState.Idle };
   };
   return {
     sendVideoUrl,

@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { VideoInfoDto } from "../types/VideoInfoDto";
 import { useVideoHistory } from "../services/useVideoHistory";
+import { useApi } from "./ApiProvider";
 
 type VideoProcessHistoryContextType = {
   processingHistory: VideoInfoDto[];
@@ -23,8 +24,15 @@ export const VideoProcessHistoryProvider = ({
   children: ReactNode;
 }) => {
   const [history, setHistory] = useState<VideoInfoDto[]>([]);
+  const { downloadLinkAvailable, currentVideo } = useApi();
+  const { getAll, clear, add } = useVideoHistory();
 
-  const { getAll, clear } = useVideoHistory();
+  useEffect(() => {
+    if (downloadLinkAvailable && currentVideo) {
+      add(currentVideo);
+      setHistory(getAll());
+    }
+  }, [downloadLinkAvailable, currentVideo]);
 
   useEffect(() => {
     setHistory(getAll());

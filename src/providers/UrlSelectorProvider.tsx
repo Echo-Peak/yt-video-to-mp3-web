@@ -1,4 +1,11 @@
-import React, { createContext, useState, useContext, ReactNode } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useEffect,
+} from "react";
+import { useApi } from "./ApiProvider";
 
 interface UrlSelectorContextType {
   url: string;
@@ -11,6 +18,13 @@ const UrlSelectorContext = createContext<UrlSelectorContextType | undefined>(
 
 export const UrlSelectorProvider = ({ children }: { children: ReactNode }) => {
   const [url, setUrl] = useState<string>("");
+  const { downloadLinkAvailable } = useApi();
+
+  useEffect(() => {
+    if (downloadLinkAvailable) {
+      setUrl("");
+    }
+  }, [downloadLinkAvailable]);
 
   return (
     <UrlSelectorContext.Provider value={{ url, setUrl }}>

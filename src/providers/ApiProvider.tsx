@@ -16,8 +16,10 @@ import { useVideoHistory } from "../services/useVideoHistory";
 type ApiContextType = {
   sendVideo: (videoUrl: string) => Promise<void>;
   videoStatus?: ConversionState;
-  currentlyProcessing?: VideoInfoDto | null;
+  currentVideo?: VideoInfoDto | null;
   processingError?: string;
+  downloadLinkAvailable?: string;
+  isProcessing?: boolean;
 };
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -34,8 +36,11 @@ const selectThumbnailSize = (thumbnails: YouTubeThumbnails) => {
 };
 
 export const ApiProvider = ({ children }: { children: ReactNode }) => {
-  const [currentlyProcessing, setCurrentlyProcessing] =
-    useState<VideoInfoDto | null>(null);
+  const [currentVideo, setCurrentVideo] = useState<VideoInfoDto | null>(null);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+
+  const [downloadLinkAvailable, setDownloadLinkAvailable] =
+    useState<string>("");
   const [processingError, setProcessingError] = useState<string>("");
 
   const [conversionStatusInterval, setConversionStatusInterval] =
@@ -45,7 +50,6 @@ export const ApiProvider = ({ children }: { children: ReactNode }) => {
     ConversionState.Idle
   );
   const api = useBackendApi();
-  const videoHistory = useVideoHistory();
 
   const createInterval = () => {
     clearInterval(conversionStatusInterval as NodeJS.Timeout);
@@ -54,20 +58,24 @@ export const ApiProvider = ({ children }: { children: ReactNode }) => {
       if (videoId) {
         api
           .getStatus(videoId)
-          .then((status) => {
-            setVideoStatus(status);
-            if (status === ConversionState.Completed) {
+          .then((res) => {
+            setVideoStatus(res.status);
+            if (res.status === ConversionState.Completed) {
+              setDownloadLinkAvailable(res.downloadUrl || "");
               clearInterval(interval);
             }
-            if (status === ConversionState.Error) {
+            if (res.status === ConversionState.Error) {
               clearInterval(interval);
             }
           })
           .catch((error) => {
             setProcessingError((error as Error).message);
             setVideoStatus(ConversionState.Error);
-            setCurrentlyProcessing(null);
+            setCurrentVideo(null);
             clearInterval(interval);
+          })
+          .finally(() => {
+            setIsProcessing(false);
           });
       }
     }, 5000);
@@ -78,13 +86,15 @@ export const ApiProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("videoId", extractVideoId(videoUrl));
     setVideoStatus(ConversionState.InProgress);
     setProcessingError("");
-
+    setDownloadLinkAvailable("");
+    setIsProcessing(true);
     try {
       const videoData = await fetchVideoData(extractVideoId(videoUrl));
       if (!videoData) {
         throw new Error("Invalid YouTube video URL");
       }
-      setCurrentlyProcessing({
+
+      setCurrentVideo({
         id: videoData.id,
         title: videoData.snippet.title as string,
         thumbnail: selectThumbnailSize(videoData.snippet.thumbnails) || "",
@@ -96,7 +106,7 @@ export const ApiProvider = ({ children }: { children: ReactNode }) => {
       createInterval();
     } catch (error) {
       setVideoStatus(ConversionState.Error);
-      setCurrentlyProcessing(null);
+      setCurrentVideo(null);
       setProcessingError((error as Error).message);
       return;
     }
@@ -105,8 +115,10 @@ export const ApiProvider = ({ children }: { children: ReactNode }) => {
   const value: ApiContextType = {
     sendVideo: prepareSend,
     videoStatus: videoStatus,
-    currentlyProcessing,
+    currentVideo,
     processingError,
+    downloadLinkAvailable,
+    isProcessing,
   };
 
   const getCachedVideoId = () => {
@@ -116,18 +128,17 @@ export const ApiProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const videoId = getCachedVideoId();
     if (videoId) {
-      api.getStatus(videoId).then((status) => {
-        setVideoStatus(status);
+      api.getStatus(videoId).then((res) => {
+        setVideoStatus(res.status);
       });
     }
   }, [setVideoStatus, api]);
 
   useEffect(() => {
-    if (videoStatus === ConversionState.Completed && currentlyProcessing) {
-      videoHistory.add(currentlyProcessing);
-      setCurrentlyProcessing(null);
+    if (videoStatus === ConversionState.Completed && currentVideo) {
+      setCurrentVideo(null);
     }
-  }, [videoStatus, currentlyProcessing, videoHistory]);
+  }, [videoStatus, currentVideo]);
 
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
 };

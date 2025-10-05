@@ -5,26 +5,15 @@ import { isValidUrl } from "../helpers/ytUrlParser";
 import { useUrlSelector } from "../providers/UrlSelectorProvider";
 
 export const UrlInput = () => {
-  const { sendVideo } = useApi();
+  const { sendVideo, downloadLinkAvailable, isProcessing } = useApi();
   const { url, setUrl } = useUrlSelector();
-
-  const [phase, setPhase] = useState<
-    "Idle" | "Submitting" | "Processing" | "Done" | "Error"
-  >("Idle");
 
   const valid = useMemo(() => isValidUrl(url.trim()), [url]);
 
   const send = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (valid) {
-      setPhase("Submitting");
-      sendVideo(url)
-        .then(() => {
-          setPhase("Done");
-        })
-        .catch(() => {
-          setPhase("Error");
-        });
+      sendVideo(url);
     }
   };
 
@@ -67,10 +56,24 @@ export const UrlInput = () => {
           type="submit"
           variant="outlined"
           size="large"
-          disabled={!valid || phase === "Submitting" || phase === "Processing"}
+          disabled={isProcessing || !valid}
         >
           Convert
         </Button>
+
+        {downloadLinkAvailable && (
+          <Button
+            id="downloadBtn"
+            variant="contained"
+            size="large"
+            color="secondary"
+            href={downloadLinkAvailable}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Download MP3
+          </Button>
+        )}
       </Stack>
     </Box>
   );

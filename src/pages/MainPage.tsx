@@ -9,7 +9,7 @@ import { UrlInputLabel } from "../components/UrlInputLabel";
 import { AuthButtons } from "../components/AuthButtons";
 
 export const MainPage = () => {
-  const { currentlyProcessing, processingError } = useApi();
+  const { currentVideo, processingError } = useApi();
   const { processingHistory, clearHistory } = useVideoProcessHistory();
 
   return (
@@ -43,7 +43,7 @@ export const MainPage = () => {
         <Card variant="glass" sx={{ p: 4, mt: 4, flex: 1 }}>
           <Stack>
             <CurrentProcessingVideo
-              videoInfo={currentlyProcessing}
+              videoInfo={currentVideo}
               processingError={processingError}
             />
           </Stack>
