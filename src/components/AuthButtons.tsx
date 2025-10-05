@@ -10,7 +10,6 @@ export const AuthButtons = () => {
         <Button
           onClick={() => {
             auth.signoutSilent();
-            auth.removeUser();
           }}
         >
           {auth.user?.profile?.email} (Logout)

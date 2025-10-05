@@ -1,14 +1,14 @@
 import "./App.css";
 import { Box, Button, Card, Container, Stack, Typography } from "@mui/material";
-import { UrlInput } from "./components/UrlInput";
-import { useApi } from "./providers/ApiProvider";
-import { useVideoProcessHistory } from "./providers/VideoProcessHistoryProvider";
-import { CurrentProcessingVideo } from "./components/CurrentProcessingVideo";
-import { VideoHistory } from "./components/VideoHistory";
-import { UrlInputLabel } from "./components/UrlInputLabel";
-import { AuthButtons } from "./components/AuthButtons";
+import { UrlInput } from "../components/UrlInput";
+import { useApi } from "../providers/ApiProvider";
+import { useVideoProcessHistory } from "../providers/VideoProcessHistoryProvider";
+import { CurrentProcessingVideo } from "../components/CurrentProcessingVideo";
+import { VideoHistory } from "../components/VideoHistory";
+import { UrlInputLabel } from "../components/UrlInputLabel";
+import { AuthButtons } from "../components/AuthButtons";
 
-function App() {
+export const MainPage = () => {
   const { currentlyProcessing, processingError } = useApi();
   const { processingHistory, clearHistory } = useVideoProcessHistory();
 
@@ -62,7 +62,11 @@ function App() {
             <Typography variant="h5" mb={1}>
               History
             </Typography>
-            <Button variant="outlined" onClick={clearHistory}>
+            <Button
+              variant="outlined"
+              onClick={clearHistory}
+              disabled={processingHistory.length === 0}
+            >
               Clear History
             </Button>
           </Box>
@@ -73,6 +77,4 @@ function App() {
       </Box>
     </Container>
   );
-}
-
-export default App;
+};

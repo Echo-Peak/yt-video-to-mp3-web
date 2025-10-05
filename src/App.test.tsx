@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import App from "./App";
+import { MainPage } from "./pages/MainPage";
 import { ApiProvider } from "./providers/ApiProvider";
 import { VideoProcessHistoryProvider } from "./providers/VideoProcessHistoryProvider";
 import { UrlSelectorProvider } from "./providers/UrlSelectorProvider";
@@ -42,7 +42,7 @@ test("Check if YouTube URL input is rendered", () => {
       <VideoProcessHistoryProvider>
         <UrlSelectorProvider>
           <AuthProvider {...mockAuthConfig}>
-            <App />
+            <MainPage />
           </AuthProvider>
         </UrlSelectorProvider>
       </VideoProcessHistoryProvider>
